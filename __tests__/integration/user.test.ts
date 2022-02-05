@@ -5,7 +5,7 @@ import {
   truncatePost,
   truncateProfile,
   truncateUser
-} from '../utilTests/truncate';
+} from '../util/truncate';
 
 import { App } from '../../src/app';
 const app = new App().server;

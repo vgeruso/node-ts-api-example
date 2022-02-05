@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from 'bcrypt';
 
 import { Resp, User } from '../util/interfaces';
+import { encrypt } from '../util/crypt';
 
 class UserRepository {
   public prisma: PrismaClient = new PrismaClient();
@@ -32,8 +32,28 @@ class UserRepository {
 
   public async store(name: string, email: string, password: string) {
     try {
+      const found: any = await this.prisma.user.findUnique({
+        where: {
+          email: `${email}`
+        }
+      });
+
+      if (found) {
+        return {
+          row: 'User already exists',
+          status: 406
+        }
+      }
+
+      if (!name || !email || !password) {
+        return {
+          row: 'User has incomplete information',
+          status: 400
+        }
+      }
+
       const saltRounds = 10;
-      const pass = await bcrypt.hash(password, saltRounds);
+      const pass = await encrypt(password, saltRounds);
 
       const store: any = await this.prisma.user.create({
         data: {

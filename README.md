@@ -1,1 +1,1 @@
-# noded-ts-api-example
+# node-ts-api-example

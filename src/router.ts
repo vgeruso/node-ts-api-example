@@ -1,5 +1,7 @@
 import { Router, Response } from "express";
 
+import { auth } from './middlewares/Auth';
+
 // Controllers
 import { userController } from "./controllers/UserController";
 
@@ -18,6 +20,7 @@ router.get('/', (_, res: Response) => {
 
 // User
 router.post('/user/store', userController.store);
-router.get('/user/list', userController.findAllUsers);
+router.post('/user/login', userController.login);
+router.put('/user/update/:id', auth, userController.update);
 
 export { router };

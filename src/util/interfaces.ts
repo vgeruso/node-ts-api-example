@@ -4,6 +4,7 @@ export interface Resp {
 }
 
 export interface User {
+  id: number,
   name: string,
   email: string
 }

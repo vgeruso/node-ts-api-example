@@ -1,5 +1,8 @@
 import { App } from './app';
+import dotenv from 'dotenv';
 
-new App().server.listen(3333, () => {
-  console.log('SERVER ON IN 3333');
+dotenv.config();
+
+new App().server.listen(process.env.PORT, () => {
+  console.log(`SERVER ON IN ${process.env.PORT}`);
 });

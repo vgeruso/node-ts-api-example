@@ -9,7 +9,3 @@ export const truncateUser = async () => {
 export const truncatePost = async () => {
   await prisma.post.deleteMany();
 }
-
-export const truncateProfile = async () => {
-  await prisma.profile.deleteMany();
-}

@@ -6,5 +6,7 @@ export interface Resp {
 export interface User {
   id: number,
   name: string,
-  email: string
+  email: string,
+  username: string,
+  bio: string
 }

@@ -7,7 +7,7 @@ import { generateToken } from '../util/tokenOptions';
 class UserRepository {
   public prisma: PrismaClient = new PrismaClient();
 
-  public async store(name: string, email: string, password: string) {
+  public async store(name: string, email: string, password: string, username: string, bio: string) {
     try {
       const found: any = await this.prisma.user.findUnique({
         where: {
@@ -22,7 +22,7 @@ class UserRepository {
         }
       }
 
-      if (!name || !email || !password) {
+      if (!name || !email || !password || !username) {
         return {
           row: 'User has incomplete information',
           status: 400
@@ -36,7 +36,9 @@ class UserRepository {
         data: {
           name: `${name}`,
           email: `${email}`,
-          password: pass
+          password: pass,
+          username: `${username}`,
+          bio: `${bio}`
         },
       });
 
@@ -44,6 +46,8 @@ class UserRepository {
         id: store.id,
         name: store.name,
         email: store.email,
+        username: store.username,
+        bio: store.bio
       }
 
       const resp: Resp = {
@@ -52,6 +56,43 @@ class UserRepository {
       }
 
       return resp;
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
+
+  public async getUserByUserName(username: string) {
+    try {
+      const found: any = await this.prisma.user.findUnique({
+        where: {
+          username: `${username}`
+        }
+      });
+
+      if (!found) {
+        return {
+          row: 'User Not found',
+          status: 404
+        }
+      }
+
+      const user: User = {
+        id: found.id,
+        name: found.name,
+        email: found.email,
+        username: found.username,
+        bio: found.bio
+      }
+
+      return {
+        row: user,
+        status: 200
+      }
     } catch (err) {
       const error: Resp = {
         row: err,
@@ -94,7 +135,9 @@ class UserRepository {
       const user: User = {
         id: found.id,
         email: found.email,
-        name: found.name
+        name: found.name,
+        username: found.username,
+        bio: found.bio
       }
 
       return {
@@ -122,22 +165,18 @@ class UserRepository {
         }
       });
 
+      if (!found) {
+        return {
+          row: 'User Not found',
+          status: 404,
+        }
+      }
+
       let password;
       if (params.password) {
         const saltRounds = 10;
         password = await encrypt(params.password, saltRounds);
       }
-
-      const update: any = await this.prisma.user.updateMany({
-        where: {
-          id: Number(id)
-        },
-        data: {
-          email: params.email,
-          name: params.name,
-          password
-        }
-      });
 
       const passwordIsValid = await comparePass(passwordConfirm, found.password);
 
@@ -148,8 +187,71 @@ class UserRepository {
         }
       }
 
+      const update: any = await this.prisma.user.updateMany({
+        where: {
+          id: Number(id)
+        },
+        data: {
+          email: params.email,
+          name: params.name,
+          password,
+          username: params.username,
+          bio: params.bio
+        }
+      });
+
       return {
-        row: update,
+        row: {
+          update,
+          msg: 'Update user successfully'
+        },
+        status: 200
+      }
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
+
+  public async delete(id: any, passwordConfirm: string) {
+    try {
+      const found: any = await this.prisma.user.findUnique({
+        where: {
+          id: Number(id)
+        }
+      });
+
+      if (!found) {
+        return {
+          row: 'User Not found',
+          status: 404
+        }
+      }
+
+      const passwordIsValid = await comparePass(passwordConfirm, found.password);
+
+      if (!passwordIsValid) {
+        return {
+          row: 'Invalid password',
+          status: 401
+        }
+      }
+
+      const deleted: any = await this.prisma.user.deleteMany({
+        where: {
+          id: Number(id)
+        }
+      });
+
+      return {
+        row: {
+          deleted,
+          msg: 'Delete user successfully'
+        },
         status: 200
       }
     } catch (err) {

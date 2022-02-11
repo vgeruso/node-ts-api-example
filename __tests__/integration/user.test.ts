@@ -164,6 +164,32 @@ describe('User', () => {
     expect(row).toHaveProperty('token');
   });
 
+  it('should not login user (email required)', async () => {
+    const { status, body } = await supertest(app)
+      .post('/api/user/login')
+      .send({
+        password
+      });
+
+    const { row } = body;
+
+    expect(status).toBe(403);
+    expect(row).toBe('Email Required');
+  });
+
+  it('should not login user (password required)', async () => {
+    const { status, body } = await supertest(app)
+      .post('/api/user/login')
+      .send({
+        email
+      });
+
+    const { row } = body;
+
+    expect(status).toBe(403);
+    expect(row).toBe('Password Required');
+  });
+
   it('should get user by username (User Not found)', async () => {
     const { status, body } = await supertest(app)
       .get(`/api/user/user`);

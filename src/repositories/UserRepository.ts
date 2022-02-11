@@ -7,11 +7,11 @@ import { generateToken } from '../util/tokenOptions';
 class UserRepository {
   public prisma: PrismaClient = new PrismaClient();
 
-  public async store(name: string, email: string, password: string, username: string, bio: string) {
+  public async store(params: any) {
     try {
       const found: any = await this.prisma.user.findUnique({
         where: {
-          email: `${email}`
+          email: `${params.email}`
         }
       });
 
@@ -22,7 +22,12 @@ class UserRepository {
         }
       }
 
-      if (!name || !email || !password || !username) {
+      if (
+        !params.name ||
+        !params.email ||
+        !params.password ||
+        !params.username
+      ) {
         return {
           row: 'User has incomplete information',
           status: 400
@@ -30,15 +35,15 @@ class UserRepository {
       }
 
       const saltRounds = 10;
-      const pass = await encrypt(password, saltRounds);
+      const pass = await encrypt(params.password, saltRounds);
 
       const store: any = await this.prisma.user.create({
         data: {
-          name: `${name}`,
-          email: `${email}`,
+          name: `${params.name}`,
+          email: `${params.email}`,
           password: pass,
-          username: `${username}`,
-          bio: `${bio}`
+          username: `${params.username}`,
+          bio: `${params.bio}`
         },
       });
 
@@ -71,6 +76,9 @@ class UserRepository {
       const found: any = await this.prisma.user.findUnique({
         where: {
           username: `${username}`
+        },
+        include: {
+          posts: true
         }
       });
 
@@ -105,6 +113,20 @@ class UserRepository {
 
   public async login(email: string, password: string) {
     try {
+      if (!email) {
+        return {
+          row: 'Email Required',
+          status: 403
+        }
+      }
+
+      if (!password) {
+        return {
+          row: 'Password Required',
+          status: 403
+        }
+      }
+
       const found: any = await this.prisma.user.findUnique({
         where: {
           email: `${email}`

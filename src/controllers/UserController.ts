@@ -6,8 +6,7 @@ import { userRepository } from '../repositories/UserRepository';
 
 class UserController {
   public async store(req: Request, res: Response) {
-    const { name, email, password, username, bio } = req.body;
-    const response: Resp = await userRepository.store(name, email, password, username, bio);
+    const response: Resp = await userRepository.store(req.body);
 
     return res.status(response.status).json(response);
   }

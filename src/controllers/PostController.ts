@@ -10,6 +10,18 @@ class PostController {
 
     return res.status(response.status).json(response);
   }
+
+  public async getByAuthId(req: Request, res: Response) {
+    const response: Resp = await postRepository.getByAuthorId(Number(req.params.authorId));
+
+    return res.status(response.status).json(response);
+  }
+
+  public async getById(req: Request, res: Response) {
+    const response: Resp = await postRepository.getById(Number(req.params.id));
+
+    return res.status(response.status).json(response);
+  }
 }
 
 export const postController = new PostController();

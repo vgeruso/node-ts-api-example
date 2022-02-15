@@ -30,5 +30,7 @@ router.get('/user/:username', userController.getUserByUserName);
 
 // Post
 router.post('/post/store', auth, postController.store);
+router.get('/post/getByAuthorId/:authorId', auth, postController.getByAuthId);
+router.get('/post/getById/:id', postController.getById);
 
 export { router };

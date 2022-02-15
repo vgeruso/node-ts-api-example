@@ -18,6 +18,7 @@ const password = faker.internet.password();
 
 let user: any;
 let token: any;
+let post: any;
 
 describe('Post', () => {
   beforeAll(async () => {
@@ -61,7 +62,10 @@ describe('Post', () => {
 
     const { row } = body;
 
+    post = row;
+
     expect(status).toBe(200);
+    expect(typeof row).toBe('object');
     expect(row.title).toBe(title);
     expect(row.content).toBe(content);
     expect(row.published).toBe(published);
@@ -81,6 +85,7 @@ describe('Post', () => {
     const { msg } = body;
 
     expect(status).toBe(403);
+    expect(typeof msg).toBe('string');
     expect(msg).toBe('Token required');
   });
 
@@ -98,6 +103,7 @@ describe('Post', () => {
     const { msg } = body;
 
     expect(status).toBe(401);
+    expect(typeof msg).toBe('string');
     expect(msg).toBe('Invalid Token');
   });
 
@@ -114,6 +120,7 @@ describe('Post', () => {
     const { row } = body;
 
     expect(status).toBe(400);
+    expect(typeof row).toBe('string');
     expect(row).toBe('Post has incomplete informations');
   });
 
@@ -130,6 +137,7 @@ describe('Post', () => {
     const { row } = body;
 
     expect(status).toBe(400);
+    expect(typeof row).toBe('string');
     expect(row).toBe('Post has incomplete informations');
   });
 
@@ -146,6 +154,7 @@ describe('Post', () => {
     const { row } = body;
 
     expect(status).toBe(400);
+    expect(typeof row).toBe('string');
     expect(row).toBe('Post has incomplete informations');
   });
 
@@ -162,6 +171,68 @@ describe('Post', () => {
     const { row } = body;
 
     expect(status).toBe(400);
+    expect(typeof row).toBe('string');
     expect(row).toBe('Post has incomplete informations');
+  });
+
+  it('should get post by authorId', async () => {
+    const { status, body } = await supertest(app)
+      .get(`/api/post/getByAuthorId/${user.id}`)
+      .set('Authorization', `bearer ${token}`);
+
+    const { row } = body;
+
+    expect(status).toBe(200);
+    expect(typeof row.posts).toBe('object');
+    expect(row.posts.length).toBe(1);
+    expect(row.posts[0].title).toBe(post.title);
+    expect(row.posts[0].content).toBe(post.content);
+    expect(row.posts[0].published).toBe(post.published);
+    expect(row.posts[0].createdAt).toBe(post.createdAt);
+    expect(row.posts[0].updatedAt).toBe(post.updatedAt);
+  });
+
+  it('should not get post by authorId (Author not found)', async () => {
+    const { status, body } = await supertest(app)
+      .get(`/api/post/getByAuthorId/000`)
+      .set('Authorization', `bearer ${token}`);
+
+    const { row } = body;
+
+    expect(status).toBe(404);
+    expect(typeof row).toBe('string');
+    expect(row).toBe('Author not found');
+  });
+
+  it('should get post by id', async () => {
+    const { status, body } = await supertest(app)
+      .get(`/api/post/getById/${post.id}`);
+
+    const { row } = body;
+
+    expect(status).toBe(200);
+    expect(typeof row).toBe('object');
+    expect(row.title).toBe(post.title);
+    expect(row.content).toBe(post.content);
+    expect(row.published).toBe(post.published);
+    expect(row.createdAt).toBe(post.createdAt);
+    expect(row.updatedAt).toBe(post.updatedAt);
+    expect(row.author.id).toBe(user.id);
+    expect(row.author.email).toBe(user.email);
+    expect(row.author.username).toBe(user.username);
+    expect(row.author.name).toBe(user.name);
+    expect(row.author.password).toBe(undefined);
+    expect(row.author.bio).toBe(undefined);
+  });
+
+  it('should not get post by id (Post not found)', async () => {
+    const { status, body } = await supertest(app)
+      .get(`/api/post/getById/000`)
+
+    const { row } = body;
+
+    expect(status).toBe(404);
+    expect(typeof row).toBe('string');
+    expect(row).toBe('Post not found');
   });
 });

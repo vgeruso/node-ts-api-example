@@ -55,6 +55,78 @@ class PostRepository {
       return error;
     }
   }
+
+  public async getByAuthorId(authorId: number) {
+    try {
+      const user: any = await this.prisma.user.findUnique({
+        where: {
+          id: authorId
+        }
+      });
+
+      if (!user) {
+        return {
+          row: 'Author not found',
+          status: 404
+        }
+      }
+
+      const posts: any = await this.prisma.post.findMany({
+        where: {
+          authorId
+        }
+      });
+
+      return {
+        row: {
+          posts
+        },
+        status: 200
+      }
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
+
+  public async getById(id: number) {
+    try {
+      const post: any = await this.prisma.post.findUnique({
+        where: {
+          id
+        },
+        include: {
+          author: true
+        }
+      });
+
+      if (!post) {
+        return {
+          row: 'Post not found',
+          status: 404
+        }
+      }
+
+      post.author.password = undefined;
+      post.author.bio = undefined;
+
+      return {
+        row: post,
+        status: 200
+      }
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
 }
 
 export const postRepository = new PostRepository();

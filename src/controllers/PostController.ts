@@ -22,6 +22,12 @@ class PostController {
 
     return res.status(response.status).json(response);
   }
+
+  public async update(req: Request, res: Response) {
+    const response: Resp = await postRepository.update(Number(req.params.id), req.body);
+
+    return res.status(response.status).json(response);
+  }
 }
 
 export const postController = new PostController();

@@ -127,6 +127,49 @@ class PostRepository {
       return error;
     }
   }
+
+  public async update(id: number, params: any) {
+    try {
+      const found: any = await this.prisma.post.findUnique({
+        where: {
+          id
+        }
+      });
+
+      if (!found) {
+        return {
+          row: 'Post not found',
+          status: 404
+        }
+      }
+
+      const update: any = await this.prisma.post.updateMany({
+        where: {
+          id
+        },
+        data: {
+          title: params.title,
+          content: params.content,
+          published: Boolean(params.publish)
+        }
+      });
+
+      return {
+        row: {
+          update,
+          msg: 'Update post successfully',
+        },
+        status: 200
+      }
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
 }
 
 export const postRepository = new PostRepository();

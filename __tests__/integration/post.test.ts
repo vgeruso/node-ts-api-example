@@ -227,7 +227,99 @@ describe('Post', () => {
 
   it('should not get post by id (Post not found)', async () => {
     const { status, body } = await supertest(app)
-      .get(`/api/post/getById/000`)
+      .get(`/api/post/getById/000`);
+
+    const { row } = body;
+
+    expect(status).toBe(404);
+    expect(typeof row).toBe('string');
+    expect(row).toBe('Post not found');
+  });
+
+  it('should update post by id title', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/${post.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        title: 'titulo teste'
+      });
+
+    const { row } = body;
+
+    expect(status).toBe(200);
+    expect(typeof row.msg).toBe('string');
+    expect(row.update.count).toBe(1);
+    expect(row.msg).toBe('Update post successfully');
+  });
+
+  it('should update post by id content', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/${post.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        content: 'conteúdo teste'
+      });
+
+    const { row } = body;
+
+    expect(status).toBe(200);
+    expect(typeof row.msg).toBe('string');
+    expect(row.update.count).toBe(1);
+    expect(row.msg).toBe('Update post successfully');
+  });
+
+  it('should update post by id publish', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/${post.id}`)
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        publish: false
+      });
+
+    const { row } = body;
+
+    expect(status).toBe(200);
+    expect(typeof row.msg).toBe('string');
+    expect(row.update.count).toBe(1);
+    expect(row.msg).toBe('Update post successfully');
+  });
+
+  it('should not authorized update user (Token required)', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/${post.id}`)
+      .send({
+        title: 'titulo teste',
+      });
+
+    const { msg } = body;
+
+    expect(status).toBe(403);
+    expect(typeof msg).toBe('string');
+    expect(msg).toBe('Token required');
+  });
+
+  it('should not authorized update user (Invalid Token)', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/${post.id}`)
+      .set('Authorization', `bearer falskd`)
+      .send({
+        title: 'titulo teste'
+      });
+
+    const { msg } = body;
+
+    expect(status).toBe(401);
+    expect(typeof msg).toBe('string');
+    expect(msg).toBe('Invalid Token');
+  });
+
+  it('should not post by id (Post not found)', async () => {
+    const { status, body } = await supertest(app)
+      .put(`/api/post/update/000`)
+      .set('Authorization', `bearer ${token}`)
+      .send({
+        title: 'titulo teste'
+      });
 
     const { row } = body;
 

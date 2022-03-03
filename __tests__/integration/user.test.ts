@@ -337,7 +337,7 @@ describe('User', () => {
     expect(row).toBe('Invalid password');
   });
 
-  it('should not update user (Invalid password)', async () => {
+  it('should not update user (User Not found)', async () => {
     const { status, body } = await supertest(app)
       .put(`/api/user/update/0`)
       .set('Authorization', `bearer ${token}`)

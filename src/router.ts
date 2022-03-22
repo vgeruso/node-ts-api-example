@@ -24,14 +24,15 @@ router.get('/', (_, res: Response) => {
 // User
 router.post('/user/store', userController.store);
 router.post('/user/login', userController.login);
+router.get('/user/:username', userController.getUserByUserName);
 router.put('/user/update/:id', auth, userController.update);
 router.delete('/user/delete/:id', auth, userController.delete);
-router.get('/user/:username', userController.getUserByUserName);
 
 // Post
 router.post('/post/store', auth, postController.store);
 router.get('/post/getByAuthorId/:authorId', auth, postController.getByAuthId);
 router.get('/post/getById/:id', postController.getById);
 router.put('/post/update/:id', auth, postController.update);
+router.delete('/post/delete/:id', auth, postController.delete);
 
 export { router };

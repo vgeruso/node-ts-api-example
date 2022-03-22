@@ -170,6 +170,44 @@ class PostRepository {
       return error;
     }
   }
+
+  public async delete(id: number) {
+    try {
+      const found: any = await this.prisma.post.findUnique({
+        where: {
+          id
+        }
+      });
+
+      if (!found) {
+        return {
+          row: 'Post not found',
+          status: 404
+        }
+      }
+
+      const update: any = await this.prisma.post.deleteMany({
+        where: {
+          id
+        }
+      });
+
+      return {
+        row: {
+          update,
+          msg: 'Update post successfully',
+        },
+        status: 200
+      }
+    } catch (err) {
+      const error: Resp = {
+        row: err,
+        status: 500
+      }
+
+      return error;
+    }
+  }
 }
 
 export const postRepository = new PostRepository();

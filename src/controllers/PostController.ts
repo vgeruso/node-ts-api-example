@@ -28,6 +28,12 @@ class PostController {
 
     return res.status(response.status).json(response);
   }
+
+  public async delete(req: Request, res: Response) {
+    const response: Resp = await postRepository.delete(Number(req.params.id));
+
+    return res.status(response.status).json(response);
+  }
 }
 
 export const postController = new PostController();

@@ -72,7 +72,7 @@ describe('Post', () => {
     expect(row.authorId).toBe(user.id);
   });
 
-  it('should not authorized update user (Token required)', async () => {
+  it('should not authorized store post (Token required)', async () => {
     const { status, body } = await supertest(app)
       .post('/api/post/store')
       .send({
@@ -89,7 +89,7 @@ describe('Post', () => {
     expect(msg).toBe('Token required');
   });
 
-  it('should not authorized update user (Invalid Token)', async () => {
+  it('should not authorized store post (Invalid Token)', async () => {
     const { status, body } = await supertest(app)
       .post('/api/post/store')
       .set('Authorization', `bearer falskd`)
@@ -284,7 +284,7 @@ describe('Post', () => {
     expect(row.msg).toBe('Update post successfully');
   });
 
-  it('should not authorized update user (Token required)', async () => {
+  it('should not authorized update post (Token required)', async () => {
     const { status, body } = await supertest(app)
       .put(`/api/post/update/${post.id}`)
       .send({
@@ -298,7 +298,7 @@ describe('Post', () => {
     expect(msg).toBe('Token required');
   });
 
-  it('should not authorized update user (Invalid Token)', async () => {
+  it('should not authorized update post (Invalid Token)', async () => {
     const { status, body } = await supertest(app)
       .put(`/api/post/update/${post.id}`)
       .set('Authorization', `bearer falskd`)
@@ -313,7 +313,7 @@ describe('Post', () => {
     expect(msg).toBe('Invalid Token');
   });
 
-  it('should not post by id (Post not found)', async () => {
+  it('should not update post by id (Post not found)', async () => {
     const { status, body } = await supertest(app)
       .put(`/api/post/update/000`)
       .set('Authorization', `bearer ${token}`)
@@ -326,5 +326,30 @@ describe('Post', () => {
     expect(status).toBe(404);
     expect(typeof row).toBe('string');
     expect(row).toBe('Post not found');
+  });
+
+  it('should not delete post (Post not found)', async () => {
+    const {status, body} = await supertest(app)
+      .delete(`/api/post/delete/000`)
+      .set('Authorization', `bearer ${token}`);
+    
+      const {row} = body;
+
+      expect(status).toBe(404);
+      expect(typeof row).toBe('string');
+      expect(row).toBe('Post not found');
+  });
+
+  it('should delete post', async () => {
+    const {status, body} = await supertest(app)
+      .delete(`/api/post/delete/${post.id}`)
+      .set('Authorization', `bearer ${token}`);
+    
+    const {row} = body;
+
+    expect(status).toBe(200);
+    expect(typeof row.msg).toBe('string');
+    expect(row.update.count).toBe(1);
+    expect(row.msg).toBe('Update post successfully');
   });
 });

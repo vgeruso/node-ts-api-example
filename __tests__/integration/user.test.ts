@@ -352,7 +352,7 @@ describe('User', () => {
     expect(row).toBe('User Not found');
   });
 
-  it('should delete user (Invalid password)', async () => {
+  it('should not delete user (Invalid password)', async () => {
     const { status, body } = await supertest(app)
       .delete(`/api/user/delete/${id}`)
       .set('Authorization', `Bearer ${token}`)
@@ -366,7 +366,7 @@ describe('User', () => {
     expect(row).toBe('Invalid password');
   });
 
-  it('should delete user (User Not found)', async () => {
+  it('should not delete user (User Not found)', async () => {
     const { status, body } = await supertest(app)
       .delete(`/api/user/delete/0`)
       .set('Authorization', `Bearer ${token}`)
